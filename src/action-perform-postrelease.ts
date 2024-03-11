@@ -1,5 +1,5 @@
-import { Octokit } from "@octokit/action";
 import * as github from "@actions/github";
+import * as core from "@actions/core";
 import { ContextArgument, createContext } from "./context";
 import { collectPrereleases } from "./collect-prereleases";
 
@@ -58,6 +58,7 @@ export async function performPostRelease(
 }
 
 export default function (releaseId: number) {
-  const octokit = new Octokit();
+  const githubToken = core.getInput('github-token');
+  const octokit = github.getOctokit(githubToken)
   return performPostRelease(createContext(octokit, github.context), releaseId);
 }

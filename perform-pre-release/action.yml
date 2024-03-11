@@ -4,6 +4,9 @@ inputs:
   release-version:
     description: 'The tag name of the target release.'
     required: true
+  github-token:
+    description: "Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`"
+    required: true
 outputs:
   releaseId:
     description: 'The numeric github id of the release to be deployed'

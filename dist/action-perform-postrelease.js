@@ -24,8 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.performPostRelease = void 0;
-const action_1 = require("@octokit/action");
 const github = __importStar(require("@actions/github"));
+const core = __importStar(require("@actions/core"));
 const context_1 = require("./context");
 const collect_prereleases_1 = require("./collect-prereleases");
 async function performPostRelease({ octokit, context, logger }, targetReleaseId) {
@@ -71,7 +71,8 @@ async function performPostRelease({ octokit, context, logger }, targetReleaseId)
 }
 exports.performPostRelease = performPostRelease;
 function default_1(releaseId) {
-    const octokit = new action_1.Octokit();
+    const githubToken = core.getInput('github-token');
+    const octokit = github.getOctokit(githubToken);
     return performPostRelease((0, context_1.createContext)(octokit, github.context), releaseId);
 }
 exports.default = default_1;

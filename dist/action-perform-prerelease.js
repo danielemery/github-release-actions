@@ -24,8 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.performPreRelease = void 0;
-const action_1 = require("@octokit/action");
 const github = __importStar(require("@actions/github"));
+const core = __importStar(require("@actions/core"));
 const context_1 = require("./context");
 const find_release_1 = require("./find-release");
 async function performPreRelease({ octokit, context, logger }, targetTagName) {
@@ -70,7 +70,8 @@ async function performPreRelease({ octokit, context, logger }, targetTagName) {
 }
 exports.performPreRelease = performPreRelease;
 function default_1(targetTagName) {
-    const octokit = new action_1.Octokit();
+    const githubToken = core.getInput('github-token');
+    const octokit = github.getOctokit(githubToken);
     return performPreRelease((0, context_1.createContext)(octokit, github.context), targetTagName);
 }
 exports.default = default_1;

@@ -1,5 +1,5 @@
-import { Octokit } from "@octokit/action";
 import * as github from "@actions/github";
+import * as core from "@actions/core";
 import { ContextArgument, createContext } from "./context";
 import { findRelease } from "./find-release";
 
@@ -63,7 +63,8 @@ export async function performPreRelease(
 }
 
 export default function (targetTagName: string) {
-  const octokit = new Octokit();
+  const githubToken = core.getInput('github-token');
+  const octokit = github.getOctokit(githubToken)
   return performPreRelease(
     createContext(octokit, github.context),
     targetTagName

@@ -1,6 +1,5 @@
-import { context } from "@actions/github";
-import { Octokit } from "@octokit/action";
-import core from "@actions/core";
+import { context, getOctokit } from "@actions/github";
+import * as core from "@actions/core";
 
 /**
  * The context exists solely to faciliate testing by inversion of control.
@@ -11,7 +10,7 @@ import core from "@actions/core";
  * other cases the createContext function should be used.
  */
 export interface ContextArgument {
-  octokit: Octokit;
+  octokit: ReturnType<typeof getOctokit>;
   context: Pick<typeof context, "repo" | "sha">;
   logger: {
     debug: typeof core.debug;
@@ -29,7 +28,7 @@ export interface ContextArgument {
  * @returns Fully initialized context object
  */
 export function createContext(
-  octokit: Octokit,
+  octokit: ReturnType<typeof getOctokit>,
   /*
    * A partial is used here to make mocking easier.
    * Additonal fields can be added as needed.

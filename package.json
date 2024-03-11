@@ -18,10 +18,10 @@
   "homepage": "https://github.com/danielemery/github-release-action#readme",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/github": "^6.0.0",
-    "@octokit/action": "^6.0.7"
+    "@actions/github": "^6.0.0"
   },
   "devDependencies": {
+    "@octokit/action": "^6.0.7",
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.25",
     "ts-node": "^10.9.2",

@@ -4,6 +4,9 @@ inputs:
   release-version:
     description: "Version string for the release"
     required: true
+  github-token:
+    description: "Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`"
+    required: true
 runs:
   using: "node20"
   main: "../dist/action-create-prerelease.js"
