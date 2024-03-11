@@ -23,56 +23,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.performPreRelease = void 0;
 const github = __importStar(require("@actions/github"));
 const core = __importStar(require("@actions/core"));
 const context_1 = require("./context");
-const find_release_1 = require("./find-release");
-async function performPreRelease({ octokit, context, logger }, targetTagName) {
-    const { owner, repo } = context.repo;
-    const targetRelease = await (0, find_release_1.findRelease)({ octokit, context, logger }, targetTagName);
-    if (!targetRelease) {
-        throw new Error(`No release found for tag: ${targetTagName}`);
-    }
-    if (targetRelease.draft) {
-        throw new Error(`Target is a draft release, failing due to possible race condition`);
-    }
-    if (targetRelease.prerelease) {
-        logger.info(`Target is a prerelease, creating a draft release`);
-        const latestRelease = await octokit.rest.repos.getLatestRelease({
-            owner,
-            repo,
-        });
-        const { data: releaseNotes } = await octokit.rest.repos.generateReleaseNotes({
-            owner,
-            repo,
-            tag_name: targetTagName,
-            previous_tag_name: latestRelease.data.tag_name,
-        });
-        const { data: draftRelease } = await octokit.rest.repos.createRelease({
-            owner,
-            repo,
-            tag_name: targetTagName,
-            name: targetTagName,
-            draft: true,
-            body: releaseNotes.body,
-        });
-        return {
-            releaseId: draftRelease.id,
-            isExistingRelease: false,
-        };
-    }
-    logger.info(`Target is an existing release, proceeding with rollback/roll forward: ${targetRelease.html_url}`);
-    return {
-        releaseId: targetRelease.id,
-        isExistingRelease: true,
-    };
-}
-exports.performPreRelease = performPreRelease;
-function default_1(targetTagName) {
-    const githubToken = core.getInput('github-token');
-    const octokit = github.getOctokit(githubToken);
-    return performPreRelease((0, context_1.createContext)(octokit, github.context), targetTagName);
-}
-exports.default = default_1;
+const perform_prerelease_1 = require("./perform-prerelease");
+const githubToken = core.getInput("github-token");
+const targetTagName = core.getInput("release-version");
+const octokit = github.getOctokit(githubToken);
+(0, perform_prerelease_1.performPreRelease)((0, context_1.createContext)(octokit, github.context), targetTagName)
+    .then((result) => {
+    core.setOutput("release-id", result.releaseId);
+    core.setOutput("is-existing-release", result.isExistingRelease);
+})
+    .catch((e) => {
+    core.setFailed(e);
+});
 //# sourceMappingURL=action-perform-prerelease.js.map

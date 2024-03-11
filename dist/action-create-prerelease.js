@@ -23,33 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPrerelease = void 0;
 const github = __importStar(require("@actions/github"));
 const core = __importStar(require("@actions/core"));
 const context_1 = require("./context");
-async function createPrerelease({ octokit, context, logger }, tag) {
-    const { owner, repo } = context.repo;
-    await octokit.rest.git.createRef({
-        owner,
-        repo,
-        ref: `refs/tags/${tag}`,
-        sha: context.sha,
-    });
-    const newRelease = await octokit.rest.repos.createRelease({
-        owner,
-        repo,
-        prerelease: true,
-        tag_name: tag,
-        name: tag,
-        generate_release_notes: true,
-    });
-    logger.info(`Created prerelease: ${newRelease.data.html_url}`);
-}
-exports.createPrerelease = createPrerelease;
-function default_1(tag) {
-    const githubToken = core.getInput('github-token');
-    const octokit = github.getOctokit(githubToken);
-    return createPrerelease((0, context_1.createContext)(octokit, github.context), tag);
-}
-exports.default = default_1;
+const create_prerelease_1 = require("./create-prerelease");
+const githubToken = core.getInput("github-token");
+const tag = core.getInput("release-version");
+const octokit = github.getOctokit(githubToken);
+(0, create_prerelease_1.createPrerelease)((0, context_1.createContext)(octokit, github.context), tag).catch((e) => {
+    core.setFailed(e);
+});
 //# sourceMappingURL=action-create-prerelease.js.map

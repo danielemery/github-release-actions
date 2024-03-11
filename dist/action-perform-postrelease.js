@@ -23,57 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.performPostRelease = void 0;
 const github = __importStar(require("@actions/github"));
 const core = __importStar(require("@actions/core"));
 const context_1 = require("./context");
-const collect_prereleases_1 = require("./collect-prereleases");
-async function performPostRelease({ octokit, context, logger }, targetReleaseId) {
-    const { owner, repo } = context.repo;
-    const { data: targetRelease } = await octokit.rest.repos.getRelease({
-        owner,
-        repo,
-        release_id: targetReleaseId,
-    });
-    if (targetRelease.draft) {
-        // Find older prereleases to delete
-        logger.info("Target is a draft release, finding prereleases to bundle up");
-        const { prereleases, skippedPreleaseCount } = await (0, collect_prereleases_1.collectPrereleases)({ octokit, context, logger }, targetRelease.tag_name);
-        // Delete older prereleases
-        logger.info(`Found ${prereleases.length} older prereleases to cleanup, ${skippedPreleaseCount} newer prereleases skipped`);
-        for (const olderPrerelease of prereleases) {
-            await octokit.rest.repos.deleteRelease({
-                owner,
-                repo,
-                release_id: olderPrerelease.id,
-            });
-        }
-        // Promote draft release to production
-        logger.info("Promoting draft release to production");
-        await octokit.rest.repos.updateRelease({
-            owner,
-            repo,
-            release_id: targetReleaseId,
-            draft: false,
-            prerelease: false,
-            latest: true,
-        });
-    }
-    else {
-        logger.info("Target is an existing release, marking release as latest");
-        await octokit.rest.repos.updateRelease({
-            owner,
-            repo,
-            release_id: targetReleaseId,
-            make_latest: "true",
-        });
-    }
-}
-exports.performPostRelease = performPostRelease;
-function default_1(releaseId) {
-    const githubToken = core.getInput('github-token');
-    const octokit = github.getOctokit(githubToken);
-    return performPostRelease((0, context_1.createContext)(octokit, github.context), releaseId);
-}
-exports.default = default_1;
+const perform_postrelease_1 = require("./perform-postrelease");
+const githubToken = core.getInput("github-token");
+const releaseId = core.getInput("release-id");
+const octokit = github.getOctokit(githubToken);
+(0, perform_postrelease_1.performPostRelease)((0, context_1.createContext)(octokit, github.context), Number(releaseId)).catch((e) => {
+    core.setFailed(e);
+});
 //# sourceMappingURL=action-perform-postrelease.js.map
