@@ -45,6 +45,10 @@ export async function performPreRelease(
       body: releaseNotes.body,
     });
 
+    logger.info(
+      `Created draft release (${draftRelease.id}): ${draftRelease.html_url}`
+    );
+
     return {
       releaseId: draftRelease.id,
       isExistingRelease: false,
@@ -52,7 +56,7 @@ export async function performPreRelease(
   }
 
   logger.info(
-    `Target is an existing release, proceeding with rollback/roll forward: ${targetRelease.html_url}`
+    `Target is an existing release (${targetRelease.id}), proceeding with rollback/roll forward: ${targetRelease.html_url}`
   );
   return {
     releaseId: targetRelease.id,

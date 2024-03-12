@@ -7,6 +7,7 @@ export async function performPostRelease(
 ) {
   const { owner, repo } = context.repo;
 
+  logger.info(`Fetching target release (${targetReleaseId})`);
   const { data: targetRelease } = await octokit.rest.repos.getRelease({
     owner,
     repo,
