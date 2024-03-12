@@ -4,6 +4,7 @@ exports.performPostRelease = void 0;
 const collect_prereleases_1 = require("./collect-prereleases");
 async function performPostRelease({ octokit, context, logger }, targetReleaseId) {
     const { owner, repo } = context.repo;
+    logger.info(`Fetching target release (${targetReleaseId})`);
     const { data: targetRelease } = await octokit.rest.repos.getRelease({
         owner,
         repo,

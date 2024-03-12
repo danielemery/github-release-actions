@@ -31,12 +31,13 @@ async function performPreRelease({ octokit, context, logger }, targetTagName) {
             draft: true,
             body: releaseNotes.body,
         });
+        logger.info(`Created draft release (${draftRelease.id}): ${draftRelease.html_url}`);
         return {
             releaseId: draftRelease.id,
             isExistingRelease: false,
         };
     }
-    logger.info(`Target is an existing release, proceeding with rollback/roll forward: ${targetRelease.html_url}`);
+    logger.info(`Target is an existing release (${targetRelease.id}), proceeding with rollback/roll forward: ${targetRelease.html_url}`);
     return {
         releaseId: targetRelease.id,
         isExistingRelease: true,
