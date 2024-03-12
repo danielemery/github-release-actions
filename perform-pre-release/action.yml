@@ -8,9 +8,9 @@ inputs:
     description: "Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`"
     required: true
 outputs:
-  releaseId:
+  release-id:
     description: 'The numeric github id of the release to be deployed'
-  isExistingRelease:
+  is-existing-release:
     description: '`true` if this is a rollback/roll forward, `false` if this is a new release'
 runs:
   using: 'node20'
