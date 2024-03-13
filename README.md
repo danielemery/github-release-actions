@@ -74,6 +74,26 @@ jobs:
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
 ```
 
+### Implementation notes
+
+#### Race Conditions
+
+In order to prevent race conditions when either two PRs are merged to main at the same time or two people trigger a release at the same time it's recommended to use the `concurrency` flag in your workflows. Note that github only allows 1 pending and one active job per concurrency group so if 3 jobs are run concurrently the middle job will be "failed".
+
+For the merge to main case you can use the below.
+
+```yml
+concurrency:
+  group: "main"
+```
+
+For the release trigger case you can use the below.
+
+```yml
+concurrency:
+  group: "prod-deployment"
+```
+
 ## Development
 
 Since the node modules need to be commited to the repo the usual process is:
