@@ -1,4 +1,4 @@
-name: '[github-release-action] Perform Pre-Release'
+name: '[github-release-actions] Perform Pre-Release'
 description: 'Determine if the release is valid. If it is a new release generate a draft. If it is an existing release continue. Intended to run immediately before releasing.'
 inputs:
   release-version:

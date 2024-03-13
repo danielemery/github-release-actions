@@ -1,5 +1,5 @@
 {
-  description = "Github Release Action Development Environment";
+  description = "GitHub Release Action Development Environment";
 
   inputs = { nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; };
 

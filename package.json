@@ -1,5 +1,5 @@
 {
-  "name": "github-release-action",
+  "name": "github-release-actions",
   "version": "0.0.0",
   "description": "Optinionated set of github release actions for tagging and deployments",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danielemery/github-release-action.git"
+    "url": "git+https://github.com/abusix/github-release-actions.git"
   },
-  "author": "Daniel Emery <danielremery@gmail.com>",
+  "author": "Daniel Emery <daniel.emery@abusix.com>",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/danielemery/github-release-action/issues"
+    "url": "https://github.com/abusix/github-release-actions/issues"
   },
-  "homepage": "https://github.com/danielemery/github-release-action#readme",
+  "homepage": "https://github.com/abusix/github-release-actions#readme",
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0"

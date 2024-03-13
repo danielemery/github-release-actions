@@ -1,6 +1,8 @@
-# github-release-action
+# github-release-actions
 
-Optinionated set of github release actions for tagging and deployments.
+Optinionated set of GitHub release actions for tagging and deployments. Used internally by Abusix - initially only by the platform team.
+
+Designed to mirror our existing release process where `main` always contains our latest changes but we can promote a specific commit on `main` to production as we see fit.
 
 ## Overview
 
@@ -28,7 +30,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: danielemery/github-release-action/create-prerelease@main # TODO target a static release
+        uses: abusix/github-release-actions/create-prerelease@main # TODO target a static release
         with:
           release-version: ${{ env.RELEASE_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +53,7 @@ jobs:
       is-existing-release: ${{ steps.pre_release.outputs.is-existing-release }}
     steps:
       - name: Perform pre-release actions
-        uses: danielemery/github-release-action/perform-pre-release@main # TODO target a static release
+        uses: abusix/github-release-actions/perform-pre-release@main # TODO target a static release
         id: pre_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +70,7 @@ jobs:
         run: echo "Deployed ${{github.ref_name}} to production"
 
       - name: Perform post-release actions
-        uses: danielemery/github-release-action/perform-post-release@main # TODO target a static release
+        uses: abusix/github-release-actions/perform-post-release@main # TODO target a static release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}

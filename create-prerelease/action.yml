@@ -1,4 +1,4 @@
-name: "[github-release-action] Create Prerelease"
+name: "[github-release-actions] Create Prerelease"
 description: "Create a prerelease github version and tag. This action is intended to be run after a PR is merged to main."
 inputs:
   release-version:

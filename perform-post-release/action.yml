@@ -1,4 +1,4 @@
-name: '[github-release-action] Perform Post-Release'
+name: '[github-release-actions] Perform Post-Release'
 description: 'Remove intermediate prereleases. Update the latest release tag to point to the new release. This action is intended to be run immediately after a release.'
 inputs:
   release-id:
