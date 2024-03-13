@@ -4,7 +4,7 @@ Optinionated set of github release actions for tagging and deployments.
 
 ## Overview
 
-### danielemery/github-release-action/create-prerelease
+### /create-prerelease
 
 ![Diagram explaining the create-prerelease action](./docs/create-prerelease.png)
 
@@ -32,6 +32,46 @@ jobs:
         with:
           release-version: ${{ env.RELEASE_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### /perform-pre-release & /perform-post-release
+
+![Diagram explaining the perform-pre-release and perform-post-release actions](./docs/perform-pre-post-release.png)
+
+#### Example usage in jobs
+
+```yml
+jobs:
+  example-prepare-production-deployment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Write is required to create a draft release
+    outputs:
+      release-id: ${{ steps.pre_release.outputs.release-id }}
+      is-existing-release: ${{ steps.pre_release.outputs.is-existing-release }}
+    steps:
+      - name: Perform pre-release actions
+        uses: danielemery/github-release-action/perform-pre-release@main # TODO target a static release
+        id: pre_release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-version: ${{github.ref_name}}
+
+  example-deploy-production:
+    runs-on: ubuntu-latest
+    needs: prepare-production-deployment
+    permissions:
+      contents: write # Write is required to delete intermediate releases and publish the final release
+    environment: production
+    steps:
+      - name: Deploy to Production
+        run: echo "Deployed ${{github.ref_name}} to production"
+
+      - name: Perform post-release actions
+        uses: danielemery/github-release-action/perform-post-release@main # TODO target a static release
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
 ```
 
 ## Development
