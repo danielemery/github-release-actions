@@ -30,7 +30,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: abusix/github-release-actions/create-prerelease@main # TODO target a static release
+        uses: abusix/github-release-actions/create-prerelease@0.1.0
         with:
           release-version: ${{ env.RELEASE_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
       is-existing-release: ${{ steps.pre_release.outputs.is-existing-release }}
     steps:
       - name: Perform pre-release actions
-        uses: abusix/github-release-actions/perform-pre-release@main # TODO target a static release
+        uses: abusix/github-release-actions/perform-pre-release@0.1.0
         id: pre_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
         run: echo "Deployed ${{github.ref_name}} to production"
 
       - name: Perform post-release actions
-        uses: abusix/github-release-actions/perform-post-release@main # TODO target a static release
+        uses: abusix/github-release-actions/perform-post-release@0.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
