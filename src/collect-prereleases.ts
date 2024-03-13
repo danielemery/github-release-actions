@@ -5,13 +5,14 @@ const DEFAULT_MAX_PAGE_SEARCH = 5;
 /**
  * Collect all prereleases, optionally filtering out those newer than a given tag.
  * @param context Context argument
- * @param olderThanTag The tag to compare prereleases against.
+ * @param excludePrereleasesAheadOfTag Optionally, exlude prereleases newer than this tag from results.
+ *                                     The number that are excluded will be returned in `newerPreleaseCount`.
  * @param maxPageSearch The maximum number of pages to look back through for prereleases. Default is 5.
  * @returns The list of prereleases and the number of newer prereleases found (and skipped).
  */
 export async function collectPrereleases(
   { octokit, context, logger }: ContextArgument,
-  olderThanTag?: string,
+  excludePrereleasesAheadOfTag?: string,
   maxPageSearch = DEFAULT_MAX_PAGE_SEARCH
 ) {
   const { owner, repo } = context.repo;
@@ -40,7 +41,7 @@ export async function collectPrereleases(
     currentPage++;
   }
 
-  if (olderThanTag === undefined) {
+  if (excludePrereleasesAheadOfTag === undefined) {
     return { prereleases, newerPreleaseCount: 0 };
   }
 
@@ -51,11 +52,11 @@ export async function collectPrereleases(
     const diff = await octokit.rest.repos.compareCommitsWithBasehead({
       owner,
       repo,
-      basehead: `${prerelease.tag_name}...${olderThanTag}`,
+      basehead: `${prerelease.tag_name}...${excludePrereleasesAheadOfTag}`,
     });
 
     logger.debug(
-      `Comparing ${prerelease.tag_name} and ${olderThanTag}, ahead by: ${diff.data.ahead_by}, behind by: ${diff.data.behind_by}`
+      `Comparing ${prerelease.tag_name} and ${excludePrereleasesAheadOfTag}, ahead by: ${diff.data.ahead_by}, behind by: ${diff.data.behind_by}`
     );
 
     if (diff.data.behind_by > 0) {
