@@ -30,7 +30,11 @@ const perform_postrelease_1 = require("./perform-postrelease");
 const githubToken = core.getInput("github-token");
 const releaseId = core.getInput("release-id");
 const octokit = github.getOctokit(githubToken);
-(0, perform_postrelease_1.performPostRelease)((0, context_1.createContext)(octokit, github.context), Number(releaseId)).catch((e) => {
+(0, perform_postrelease_1.performPostRelease)((0, context_1.createContext)(octokit, github.context), Number(releaseId))
+    .then((result) => {
+    core.setOutput("release-url", result.releaseUrl);
+})
+    .catch((e) => {
     core.setFailed(e);
 });
 //# sourceMappingURL=action-perform-postrelease.js.map

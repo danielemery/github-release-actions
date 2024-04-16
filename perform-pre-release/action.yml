@@ -12,6 +12,8 @@ outputs:
     description: 'The numeric github id of the release to be deployed'
   is-existing-release:
     description: '`true` if this is a rollback/roll forward, `false` if this is a new release'
+  release-url:
+    description: 'The Github URL of the release to be deployed'
 runs:
   using: 'node20'
   main: '../dist/action-perform-prerelease.js'

@@ -52,6 +52,7 @@ export async function performPreRelease(
     return {
       releaseId: draftRelease.id,
       isExistingRelease: false,
+      releaseUrl: draftRelease.html_url,
     };
   }
 
@@ -61,5 +62,6 @@ export async function performPreRelease(
   return {
     releaseId: targetRelease.id,
     isExistingRelease: true,
+    releaseUrl: targetRelease.html_url,
   };
 }

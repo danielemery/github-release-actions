@@ -10,6 +10,7 @@ performPreRelease(createContext(octokit, github.context), targetTagName)
   .then((result) => {
     core.setOutput("release-id", result.releaseId);
     core.setOutput("is-existing-release", result.isExistingRelease);
+    core.setOutput("release-url", result.releaseUrl);
   })
   .catch((e) => {
     core.setFailed(e);
