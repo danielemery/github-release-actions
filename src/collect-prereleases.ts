@@ -3,16 +3,26 @@ import { ContextArgument } from "./context";
 const DEFAULT_MAX_PAGE_SEARCH = 5;
 
 /**
- * Collect all prereleases, optionally filtering out those newer than a given tag.
+ * Note the result of the GitHub API calls have many more fields.
+ * This interface only contains those in use.
+ */
+interface Prerelease {
+  tag_name: string;
+  id: number;
+  body?: string | null;
+}
+
+/**
+ * Collect all prereleases, splitting those newer and older than a given tag into two separate lists.
  * @param context Context argument
- * @param excludePrereleasesAheadOfTag Optionally, exlude prereleases newer than this tag from results.
- *                                     The number that are excluded will be returned in `newerPreleaseCount`.
+ * @param excludePrereleasesAheadOfTag Separate prereleases into those newer than this tag and those older than this tag in the results.
+ *                                     A prerelease matching this tag exactly will be included in the olderReleases list.
  * @param maxPageSearch The maximum number of pages to look back through for prereleases. Default is 5.
  * @returns The list of prereleases and the number of newer prereleases found (and skipped).
  */
 export async function collectPrereleases(
   { octokit, context, logger }: ContextArgument,
-  excludePrereleasesAheadOfTag?: string,
+  excludePrereleasesAheadOfTag: string,
   maxPageSearch = DEFAULT_MAX_PAGE_SEARCH
 ) {
   const { owner, repo } = context.repo;
@@ -25,14 +35,13 @@ export async function collectPrereleases(
       repo,
     }
   );
-  let prereleases: { tag_name: string; id: number; body?: string | null }[] =
-    [];
+  let allPrereleases: Prerelease[] = [];
   let currentPage = 1;
   for await (const value of releasesIterator) {
     logger.debug(
       `Searching through release page #${currentPage} for prereleases`
     );
-    prereleases = prereleases.concat(
+    allPrereleases = allPrereleases.concat(
       value.data.filter((release) => release.prerelease)
     );
     if (currentPage > maxPageSearch) {
@@ -41,14 +50,10 @@ export async function collectPrereleases(
     currentPage++;
   }
 
-  if (excludePrereleasesAheadOfTag === undefined) {
-    return { prereleases, newerPreleaseCount: 0 };
-  }
-
-  // Determine which prereleases are older than the target release
-  let newerPreleaseCount = 0;
-  const olderPreleases = [];
-  for (const prerelease of prereleases) {
+  // Split prereleases into older and newer than the target release
+  const newerPrereleases: Prerelease[] = [];
+  const olderPrereleases: Prerelease[] = [];
+  for (const prerelease of allPrereleases) {
     const diff = await octokit.rest.repos.compareCommitsWithBasehead({
       owner,
       repo,
@@ -61,19 +66,18 @@ export async function collectPrereleases(
 
     if (diff.data.behind_by > 0) {
       logger.debug(
-        `Prerelease ${prerelease.tag_name} is newer than target release, skipping`
+        `Prerelease ${prerelease.tag_name} is newer than target release, adding to newer list`
       );
-      newerPreleaseCount++;
-      continue;
+      newerPrereleases.push(prerelease);
     } else {
       logger.debug(
-        `Prerelease ${prerelease.tag_name} is older than target release, adding to list`
+        `Prerelease ${prerelease.tag_name} is older than target release, adding to older list`
       );
-      olderPreleases.push(prerelease);
+      olderPrereleases.push(prerelease);
     }
   }
   return {
-    prereleases: olderPreleases,
-    skippedPreleaseCount: newerPreleaseCount,
+    olderPrereleases,
+    newerPrereleases,
   };
 }

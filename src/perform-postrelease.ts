@@ -17,16 +17,16 @@ export async function performPostRelease(
   if (targetRelease.draft) {
     // Find all prereleases that will be included in the target release
     logger.info("Target is a draft release, finding prereleases to bundle up");
-    const { prereleases, skippedPreleaseCount } = await collectPrereleases(
+    const { olderPrereleases, newerPrereleases } = await collectPrereleases(
       { octokit, context, logger },
       targetRelease.tag_name
     );
 
     // Delete all these prereleases
     logger.info(
-      `Found ${prereleases.length} older prereleases to cleanup, ${skippedPreleaseCount} newer prereleases skipped`
+      `Found ${olderPrereleases.length} older prereleases to cleanup, ${newerPrereleases.length} newer prereleases to update release notes for.`
     );
-    for (const prerelease of prereleases) {
+    for (const prerelease of olderPrereleases) {
       logger.debug(
         `Deleting prerelease ${prerelease.tag_name} (${prerelease.id})`
       );
@@ -61,6 +61,25 @@ export async function performPostRelease(
     logger.info(
       `Draft release promoted to latest: ${updatedRelease.data.html_url}`
     );
+
+    // Regenerate release notes for all newer prereleases
+    for (const prerelease of newerPrereleases) {
+      logger.debug(`Regenerating release notes for ${prerelease.tag_name}`);
+      const { data: releaseNotes } =
+        await octokit.rest.repos.generateReleaseNotes({
+          owner,
+          repo,
+          tag_name: prerelease.tag_name,
+          previous_tag_name: updatedRelease.data.tag_name,
+        });
+      await octokit.rest.repos.updateRelease({
+        owner,
+        repo,
+        release_id: prerelease.id,
+        body: releaseNotes.body,
+      });
+    }
+
     return {
       releaseUrl: updatedRelease.data.html_url,
     };

@@ -13,10 +13,10 @@ async function performPostRelease({ octokit, context, logger }, targetReleaseId)
     if (targetRelease.draft) {
         // Find all prereleases that will be included in the target release
         logger.info("Target is a draft release, finding prereleases to bundle up");
-        const { prereleases, skippedPreleaseCount } = await (0, collect_prereleases_1.collectPrereleases)({ octokit, context, logger }, targetRelease.tag_name);
+        const { olderPrereleases, newerPrereleases } = await (0, collect_prereleases_1.collectPrereleases)({ octokit, context, logger }, targetRelease.tag_name);
         // Delete all these prereleases
-        logger.info(`Found ${prereleases.length} older prereleases to cleanup, ${skippedPreleaseCount} newer prereleases skipped`);
-        for (const prerelease of prereleases) {
+        logger.info(`Found ${olderPrereleases.length} older prereleases to cleanup, ${newerPrereleases.length} newer prereleases to update release notes for.`);
+        for (const prerelease of olderPrereleases) {
             logger.debug(`Deleting prerelease ${prerelease.tag_name} (${prerelease.id})`);
             await octokit.rest.repos.deleteRelease({
                 owner,
@@ -46,6 +46,22 @@ async function performPostRelease({ octokit, context, logger }, targetReleaseId)
             latest: true,
         });
         logger.info(`Draft release promoted to latest: ${updatedRelease.data.html_url}`);
+        // Regenerate release notes for all newer prereleases
+        for (const prerelease of newerPrereleases) {
+            logger.debug(`Regenerating release notes for ${prerelease.tag_name}`);
+            const { data: releaseNotes } = await octokit.rest.repos.generateReleaseNotes({
+                owner,
+                repo,
+                tag_name: prerelease.tag_name,
+                previous_tag_name: updatedRelease.data.tag_name,
+            });
+            await octokit.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: prerelease.id,
+                body: releaseNotes.body,
+            });
+        }
         return {
             releaseUrl: updatedRelease.data.html_url,
         };
