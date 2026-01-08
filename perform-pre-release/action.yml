@@ -15,5 +15,5 @@ outputs:
   release-url:
     description: 'The Github URL of the release to be deployed'
 runs:
-  using: 'node20'
+  using: 'node24'
   main: '../dist/action-perform-prerelease.js'

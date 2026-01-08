@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPrerelease = void 0;
+exports.createPrerelease = createPrerelease;
 async function createPrerelease({ octokit, context, logger }, tag) {
     const { owner, repo } = context.repo;
     await octokit.rest.git.createRef({
@@ -19,5 +19,4 @@ async function createPrerelease({ octokit, context, logger }, tag) {
     });
     logger.info(`Created prerelease: ${newRelease.data.html_url}`);
 }
-exports.createPrerelease = createPrerelease;
 //# sourceMappingURL=create-prerelease.js.map
