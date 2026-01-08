@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.collectPrereleases = void 0;
+exports.collectPrereleases = collectPrereleases;
 const DEFAULT_MAX_PAGE_SEARCH = 5;
 /**
  * Collect all prereleases, splitting those newer and older than a given tag into two separate lists.
@@ -51,5 +51,4 @@ async function collectPrereleases({ octokit, context, logger }, excludePrereleas
         newerPrereleases,
     };
 }
-exports.collectPrereleases = collectPrereleases;
 //# sourceMappingURL=collect-prereleases.js.map

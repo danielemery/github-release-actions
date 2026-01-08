@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findRelease = void 0;
+exports.findRelease = findRelease;
 const DEFAULT_MAX_PAGE_SEARCH = 5;
 /**
  * Find the release with the given tag name.
@@ -30,5 +30,4 @@ async function findRelease({ octokit, context, logger }, targetTagName, maxPageS
     }
     return null;
 }
-exports.findRelease = findRelease;
 //# sourceMappingURL=find-release.js.map

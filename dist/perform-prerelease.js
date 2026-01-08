@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.performPreRelease = void 0;
+exports.performPreRelease = performPreRelease;
 const find_release_1 = require("./find-release");
 async function performPreRelease({ octokit, context, logger }, targetTagName) {
     const { owner, repo } = context.repo;
@@ -45,5 +45,4 @@ async function performPreRelease({ octokit, context, logger }, targetTagName) {
         releaseUrl: targetRelease.html_url,
     };
 }
-exports.performPreRelease = performPreRelease;
 //# sourceMappingURL=perform-prerelease.js.map
