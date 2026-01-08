@@ -96,6 +96,10 @@ concurrency:
   group: "prod-deployment"
 ```
 
+## Prerequisites
+
+Note that the action requires an existing release to be present before it's first run. It's recommended for greenfield projects to push a tag manually for your initial commit and create an auto-generated Github release for that tag using the GitHub UI.
+
 ## Development
 
 Since the node modules need to be commited to the repo the usual process is:
