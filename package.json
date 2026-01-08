@@ -1,6 +1,6 @@
 {
   "name": "github-release-actions",
-  "version": "0.3.0-update-node-and-packages.0",
+  "version": "0.3.0",
   "description": "Optinionated set of github release actions for tagging and deployments",
   "scripts": {
     "build": "tsc",
