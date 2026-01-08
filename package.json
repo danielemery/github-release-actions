@@ -21,10 +21,8 @@
     "@actions/github": "^6.0.0"
   },
   "devDependencies": {
-    "@octokit/action": "^6.0.7",
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.25",
-    "ts-node": "^10.9.2",
     "typescript": "^5.4.2"
   }
 }
