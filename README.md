@@ -116,6 +116,8 @@ jobs:
 | `release-id`          | The numeric github id of the release to be deployed.                           |
 | `is-existing-release` | `true` if this is a rollback/roll forward, `false` if this is a new release.   |
 | `release-url`         | The Github URL of the release to be deployed.                                  |
+| `release-tag`         | The tag name of the release to be deployed. Equal to the `release-version` input except with `promote-to-stable`, where it is the derived stable tag (e.g. `v1.2.3` for input `v1.2.3-rc.2`). |
+| `release-version`     | `release-tag` with any leading `v` stripped (e.g. `1.2.3`), for consumers like Docker image tags. |
 
 #### perform-post-release inputs
 
