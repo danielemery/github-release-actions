@@ -11,6 +11,24 @@ const DEFAULT_MAX_PAGE_SEARCH = 5;
  */
 async function findRelease({ octokit, context, logger }, targetTagName, maxPageSearch = DEFAULT_MAX_PAGE_SEARCH) {
     const { owner, repo } = context.repo;
+    // Direct lookup first: unlike the list endpoint it is read-after-write
+    // consistent, so a release created moments earlier is found reliably.
+    // Drafts are not addressable by tag, so fall through to the list search
+    // below which can still surface them.
+    try {
+        const { data: release } = await octokit.rest.repos.getReleaseByTag({
+            owner,
+            repo,
+            tag: targetTagName,
+        });
+        return release;
+    }
+    catch (e) {
+        if (e.status !== 404) {
+            throw e;
+        }
+        logger.debug(`No published release found by tag ${targetTagName}, searching the release list`);
+    }
     const releasesIterator = octokit.paginate.iterator(octokit.rest.repos.listReleases, {
         owner,
         repo,

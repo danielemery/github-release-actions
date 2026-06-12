@@ -39,8 +39,9 @@ const context_1 = require("./context");
 const perform_prerelease_1 = require("./perform-prerelease");
 const githubToken = core.getInput("github-token");
 const targetTagName = core.getInput("release-version");
+const promoteToStable = core.getInput("promote-to-stable") === "true";
 const octokit = github.getOctokit(githubToken);
-(0, perform_prerelease_1.performPreRelease)((0, context_1.createContext)(octokit, github.context), targetTagName)
+(0, perform_prerelease_1.performPreRelease)((0, context_1.createContext)(octokit, github.context), targetTagName, promoteToStable)
     .then((result) => {
     core.setOutput("release-id", result.releaseId);
     core.setOutput("is-existing-release", result.isExistingRelease);
