@@ -1,0 +1,22 @@
+# validate-semver-label/action.yml
+name: '[github-release-actions] Validate Semver Label'
+description: |
+  Fail unless the PR has exactly one `semver:major`, `semver:minor`, or
+  `semver:patch` label. Early gate sibling to calculate-prerelease-version.
+inputs:
+  github-token:
+    description: |
+      Token used to construct the API client for the shared action context. This
+      action makes no API calls, but a token is required to build the client.
+    required: true
+  labels-override:
+    description: |
+      Override the PR-labels lookup with an explicit list (newline- or
+      comma-separated). When set, event labels are ignored. For non-PR callers.
+    required: false
+outputs:
+  bump:
+    description: 'The validated bump type (major, minor, patch)'
+runs:
+  using: 'node24'
+  main: '../dist/action-validate-semver-label.js'
