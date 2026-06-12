@@ -149,6 +149,7 @@ export async function performPreRelease(
       releaseId: draftRelease.id,
       isExistingRelease: false,
       releaseUrl: draftRelease.html_url,
+      releaseTag: releaseTagName,
     };
   }
 
@@ -166,5 +167,6 @@ export async function performPreRelease(
     releaseId: targetRelease.id,
     isExistingRelease: true,
     releaseUrl: targetRelease.html_url,
+    releaseTag: targetRelease.tag_name,
   };
 }

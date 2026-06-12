@@ -113,6 +113,7 @@ promoteToStable = false) {
             releaseId: draftRelease.id,
             isExistingRelease: false,
             releaseUrl: draftRelease.html_url,
+            releaseTag: releaseTagName,
         };
     }
     if (stableTagName) {
@@ -124,6 +125,7 @@ promoteToStable = false) {
         releaseId: targetRelease.id,
         isExistingRelease: true,
         releaseUrl: targetRelease.html_url,
+        releaseTag: targetRelease.tag_name,
     };
 }
 //# sourceMappingURL=perform-prerelease.js.map

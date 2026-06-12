@@ -12,6 +12,8 @@ performPreRelease(createContext(octokit, github.context), targetTagName, promote
     core.setOutput("release-id", result.releaseId);
     core.setOutput("is-existing-release", result.isExistingRelease);
     core.setOutput("release-url", result.releaseUrl);
+    core.setOutput("release-tag", result.releaseTag);
+    core.setOutput("release-version", result.releaseTag.replace(/^v/, ""));
   })
   .catch((e) => {
     core.setFailed(e);

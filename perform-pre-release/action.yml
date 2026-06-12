@@ -25,6 +25,15 @@ outputs:
     description: '`true` if this is a rollback/roll forward, `false` if this is a new release'
   release-url:
     description: 'The Github URL of the release to be deployed'
+  release-tag:
+    description: |
+      The tag name of the release to be deployed. Equal to the release-version
+      input except when promote-to-stable is set, where it is the derived
+      stable tag (e.g. v1.2.3 for input v1.2.3-rc.2).
+  release-version:
+    description: |
+      release-tag with any leading `v` stripped (e.g. 1.2.3), for consumers
+      like Docker image tags that want a bare version.
 runs:
   using: 'node24'
   main: '../dist/action-perform-prerelease.js'

@@ -114,6 +114,7 @@ describe("performPreRelease", () => {
       releaseId: 42,
       isExistingRelease: false,
       releaseUrl: "http://release/42",
+      releaseTag: "2026-06-12",
     });
     expect(created).toHaveLength(1);
     expect(created[0]).toMatchObject({ tag_name: "2026-06-12", draft: true });
@@ -127,6 +128,7 @@ describe("performPreRelease", () => {
     });
     const result = await performPreRelease(ctx, "v1.1.0-rc.2", true);
     expect(result.isExistingRelease).toBe(false);
+    expect(result.releaseTag).toBe("v1.1.0");
     expect(created[0]).toMatchObject({
       tag_name: "v1.1.0",
       name: "v1.1.0",
@@ -206,6 +208,7 @@ describe("performPreRelease", () => {
       releaseId: 7,
       isExistingRelease: true,
       releaseUrl: "http://release/7",
+      releaseTag: "v1.0.0",
     });
     expect(created).toHaveLength(0);
   });
