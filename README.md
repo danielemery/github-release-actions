@@ -54,7 +54,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
+        uses: danielemery/github-release-actions/create-prerelease@v0.5.0
         with:
           release-version: ${{ env.RELEASE_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
     environment: staging
     steps:
       - name: Calculate prerelease version
-        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.5.0
         id: calculate_version
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -90,7 +90,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
+        uses: danielemery/github-release-actions/create-prerelease@v0.5.0
         with:
           # The v-prefixed tag output, NOT the bare version output.
           release-version: ${{ steps.calculate_version.outputs.tag }}
@@ -139,7 +139,7 @@ jobs:
       is-existing-release: ${{ steps.pre_release.outputs.is-existing-release }}
     steps:
       - name: Perform pre-release actions
-        uses: danielemery/github-release-actions/perform-pre-release@v0.4.0
+        uses: danielemery/github-release-actions/perform-pre-release@v0.5.0
         id: pre_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -156,7 +156,7 @@ jobs:
         run: echo "Deployed ${{github.ref_name}} to production"
 
       - name: Perform post-release actions
-        uses: danielemery/github-release-actions/perform-post-release@v0.4.0
+        uses: danielemery/github-release-actions/perform-post-release@v0.5.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
@@ -168,7 +168,7 @@ With date tags the production release keeps the tag it was given at prerelease t
 
 ```yml
 - name: Perform pre-release actions
-  uses: danielemery/github-release-actions/perform-pre-release@v0.4.0 # 0.5.0 or later required for promote-to-stable
+  uses: danielemery/github-release-actions/perform-pre-release@v0.5.0
   id: pre_release
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -207,7 +207,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate semver label
-        uses: danielemery/github-release-actions/validate-semver-label@v0.4.0
+        uses: danielemery/github-release-actions/validate-semver-label@v0.5.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -249,7 +249,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Calculate prerelease version
-        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.5.0
         id: calculate_version
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -306,5 +306,5 @@ The process:
 1. Label the PR with `semver:major`, `semver:minor` or `semver:patch` (enforced by the Validate PR workflow).
 2. Merge the PR: the Release Candidate workflow cuts the next `vX.Y.Z-rc.N` tag and prerelease automatically.
 3. Test the prerelease tag in a downstream project.
-4. Run the Release Stable workflow **from the prerelease tag being promoted** (so the stable tag lands on the same commit), entering the stable version (e.g. `v0.5.0`). This creates the stable tag, publishes the release, and cleans up the intermediate rc releases and tags.
+4. Run the Release Stable workflow (from any branch), pasting the prerelease version to promote (e.g. `v0.5.0-rc.1`). The stable tag is derived automatically and created on the prerelease's commit, the release is published, and the intermediate rc releases and tags are cleaned up.
 5. In a follow-up PR, bump the pinned action versions in the release workflows to the new release.
