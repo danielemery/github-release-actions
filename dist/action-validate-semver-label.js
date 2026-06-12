@@ -33,34 +33,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createContext = createContext;
+// src/action-validate-semver-label.ts
+const github = __importStar(require("@actions/github"));
 const core = __importStar(require("@actions/core"));
-/**
- * Create a context object containing everything each action needs to run.
- *
- * @param octokit The Octokit instance
- * @param githubContext The context object from the GitHub action
- * @returns Fully initialized context object
- */
-function createContext(octokit, 
-/*
- * A partial is used here to make mocking easier.
- * Additonal fields can be added as needed.
- */
-githubContext) {
-    return {
-        octokit,
-        context: {
-            repo: githubContext.repo,
-            sha: githubContext.sha,
-            payload: githubContext.payload,
-        },
-        logger: {
-            debug: core.debug,
-            info: core.info,
-            warning: core.warning,
-            error: core.error,
-        },
-    };
-}
-//# sourceMappingURL=context.js.map
+const context_1 = require("./context");
+const validate_semver_label_1 = require("./validate-semver-label");
+const githubToken = core.getInput("github-token");
+const labelsOverride = core.getInput("labels-override") || undefined;
+const octokit = github.getOctokit(githubToken);
+(0, validate_semver_label_1.validateSemverLabel)((0, context_1.createContext)(octokit, github.context), { labelsOverride })
+    .then((result) => {
+    core.setOutput("bump", result.bump);
+})
+    .catch((e) => {
+    core.setFailed(e);
+});
+//# sourceMappingURL=action-validate-semver-label.js.map

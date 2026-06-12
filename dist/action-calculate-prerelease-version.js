@@ -33,34 +33,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createContext = createContext;
+// src/action-calculate-prerelease-version.ts
+const github = __importStar(require("@actions/github"));
 const core = __importStar(require("@actions/core"));
-/**
- * Create a context object containing everything each action needs to run.
- *
- * @param octokit The Octokit instance
- * @param githubContext The context object from the GitHub action
- * @returns Fully initialized context object
- */
-function createContext(octokit, 
-/*
- * A partial is used here to make mocking easier.
- * Additonal fields can be added as needed.
- */
-githubContext) {
-    return {
-        octokit,
-        context: {
-            repo: githubContext.repo,
-            sha: githubContext.sha,
-            payload: githubContext.payload,
-        },
-        logger: {
-            debug: core.debug,
-            info: core.info,
-            warning: core.warning,
-            error: core.error,
-        },
-    };
-}
-//# sourceMappingURL=context.js.map
+const context_1 = require("./context");
+const calculate_prerelease_version_1 = require("./calculate-prerelease-version");
+const githubToken = core.getInput("github-token");
+const bump = core.getInput("bump") || undefined;
+const prereleaseIdentifier = core.getInput("prerelease-identifier") || undefined;
+const octokit = github.getOctokit(githubToken);
+(0, calculate_prerelease_version_1.calculatePrereleaseVersion)((0, context_1.createContext)(octokit, github.context), { bump, prereleaseIdentifier })
+    .then((result) => {
+    core.setOutput("version", result.version);
+    core.setOutput("tag", `v${result.version}`);
+    core.setOutput("base-version", result.baseVersion);
+    core.setOutput("base-tag", `v${result.baseVersion}`);
+    core.setOutput("bump", result.bump);
+    core.setOutput("effective-bump", result.effectiveBump);
+})
+    .catch((e) => {
+    core.setFailed(e);
+});
+//# sourceMappingURL=action-calculate-prerelease-version.js.map

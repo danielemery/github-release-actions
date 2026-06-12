@@ -1,0 +1,41 @@
+# calculate-prerelease-version/action.yml
+name: '[github-release-actions] Calculate Prerelease Version'
+description: |
+  Calculate the next prerelease version from PR labels (or an explicit bump) and
+  existing tags. Bump type is read from the PR's `semver:major|minor|patch` label;
+  the `semver:` prefix is fixed. Tags are listed via the GitHub API, so the
+  consumer's checkout does not need `fetch-depth: 0`.
+inputs:
+  github-token:
+    description: 'Token used to list repository tags via the GitHub API.'
+    required: true
+  bump:
+    description: |
+      Override the PR-label lookup with an explicit bump type (major|minor|patch).
+      When set, `semver:*` labels are ignored. Useful for non-PR callers.
+    required: false
+  prerelease-identifier:
+    description: |
+      Identifier between the base version and counter, producing `v{base}-{id}.N`
+      (e.g. unstable, beta, rc). Must match /^[0-9A-Za-z-]+$/. Defaults to unstable.
+    required: false
+    default: 'unstable'
+outputs:
+  version:
+    description: 'Full prerelease version, bare (e.g. 1.2.3-unstable.0)'
+  tag:
+    description: 'Full prerelease version, v-prefixed (e.g. v1.2.3-unstable.0)'
+  base-version:
+    description: 'Base version without prerelease suffix, bare (e.g. 1.2.3)'
+  base-tag:
+    description: 'Base version without prerelease suffix, v-prefixed (e.g. v1.2.3)'
+  bump:
+    description: 'The bump detected from labels or input (major, minor, patch)'
+  effective-bump:
+    description: |
+      The bump the resulting version represents relative to latest stable. Usually
+      equals `bump`, but higher when an in-flight prerelease base is adopted
+      (e.g. a patch PR riding an unreleased minor line: bump=patch, effective-bump=minor).
+runs:
+  using: 'node24'
+  main: '../dist/action-calculate-prerelease-version.js'

@@ -1,10 +1,10 @@
 {
   "name": "github-release-actions",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Optinionated set of github release actions for tagging and deployments",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",
     "@types/node": "^24.10.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
   }
 }
