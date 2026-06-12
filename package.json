@@ -1,6 +1,5 @@
 {
   "name": "github-release-actions",
-  "version": "0.4.0",
   "description": "Optinionated set of github release actions for tagging and deployments",
   "scripts": {
     "build": "tsc",
