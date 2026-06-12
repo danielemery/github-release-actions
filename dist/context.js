@@ -53,6 +53,7 @@ githubContext) {
         context: {
             repo: githubContext.repo,
             sha: githubContext.sha,
+            payload: githubContext.payload,
         },
         logger: {
             debug: core.debug,

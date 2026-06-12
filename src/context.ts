@@ -11,7 +11,7 @@ import * as core from "@actions/core";
  */
 export interface ContextArgument {
   octokit: ReturnType<typeof getOctokit>;
-  context: Pick<typeof context, "repo" | "sha">;
+  context: Pick<typeof context, "repo" | "sha" | "payload">;
   logger: {
     debug: typeof core.debug;
     info: typeof core.info;
@@ -33,13 +33,14 @@ export function createContext(
    * A partial is used here to make mocking easier.
    * Additonal fields can be added as needed.
    */
-  githubContext: Pick<typeof context, "repo" | "sha">
+  githubContext: Pick<typeof context, "repo" | "sha" | "payload">
 ) {
   return {
     octokit,
     context: {
       repo: githubContext.repo,
       sha: githubContext.sha,
+      payload: githubContext.payload,
     },
     logger: {
       debug: core.debug,
