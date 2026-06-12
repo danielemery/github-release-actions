@@ -1,0 +1,19 @@
+# .github/workflows/validate-pr.yml
+name: Validate PR
+
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled, synchronize]
+
+jobs:
+  validate-semver-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Uses the local version of the action so every PR also smoke-tests the
+      # built dist/ it is about to ship.
+      - name: Validate semver label
+        uses: ./validate-semver-label
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

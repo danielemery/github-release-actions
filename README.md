@@ -13,6 +13,12 @@ The actions support two versioning schemes:
 
 The core release flow (`create-prerelease`, `perform-pre-release`, `perform-post-release`) works the same with either scheme. `validate-semver-label` and `calculate-prerelease-version` are only relevant for semver tags; if you use date tags they can be ignored.
 
+This repository uses the semver scheme to release itself, so its own workflows are a complete working reference for adopting it:
+
+- [`validate-pr.yml`](./.github/workflows/validate-pr.yml) gates every PR on having exactly one `semver:*` label.
+- [`release-candidate.yml`](./.github/workflows/release-candidate.yml) cuts a `vX.Y.Z-rc.N` prerelease on every merge to `main`.
+- [`release-stable.yml`](./.github/workflows/release-stable.yml) promotes a chosen prerelease to a stable `vX.Y.Z` release via manual dispatch.
+
 ## Overview
 
 ### /create-prerelease
@@ -23,8 +29,10 @@ The core release flow (`create-prerelease`, `perform-pre-release`, `perform-post
 
 | Name              | Required | Description                                                                                       |
 | ----------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| `release-version` | Yes      | Version string for the release.                                                                    |
+| `release-version` | Yes      | Version string for the release. Used **verbatim** as the tag name.                                 |
 | `github-token`    | Yes      | Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`.    |
+
+The tag and release are created on the commit the workflow ran on (`github.sha`). Because `release-version` is used verbatim, semver flows must pass the **v-prefixed** `tag`/`base-tag` outputs of `calculate-prerelease-version` — `calculate-prerelease-version` only recognises `v`-prefixed tags, so a bare version here would create a tag invisible to subsequent calculations.
 
 #### Example Usage in a job (date tags)
 
@@ -84,7 +92,8 @@ jobs:
       - name: Create release
         uses: danielemery/github-release-actions/create-prerelease@v0.4.0
         with:
-          release-version: ${{ steps.calculate_version.outputs.version }}
+          # The v-prefixed tag output, NOT the bare version output.
+          release-version: ${{ steps.calculate_version.outputs.tag }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -149,6 +158,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
 ```
+
+#### Promoting a semver prerelease to a stable release
+
+With date tags the production release keeps the tag it was given at prerelease time, so the two actions above are enough. With semver tags the promotion should instead produce a clean `vX.Y.Z` tag: first run `create-prerelease` with the stable tag (from the commit of the prerelease being promoted), then point `perform-pre-release`/`perform-post-release` at that stable tag. `perform-post-release` cleans up the intermediate `-{identifier}.N` releases and their tags as part of the promotion. See this repository's own [`release-stable.yml`](./.github/workflows/release-stable.yml) for a complete example.
 
 ### /validate-semver-label
 
@@ -252,14 +265,31 @@ concurrency:
 
 ## Prerequisites
 
-Note that the action requires an existing release to be present before it's first run. It's recommended for greenfield projects to push a tag manually for your initial commit and create an auto-generated Github release for that tag using the GitHub UI.
+- `perform-pre-release` requires an existing GitHub release before its first run (the latest release is used to generate release notes). It's recommended for greenfield projects to push a tag manually for your initial commit and create an auto-generated GitHub release for that tag using the GitHub UI.
+- For the semver scheme, create the `semver:major`, `semver:minor` and `semver:patch` labels in your repository so they can be applied to PRs.
+- Jobs using `create-prerelease`, `perform-pre-release` or `perform-post-release` need the `contents: write` permission (to write tags and create/update/delete releases). `validate-semver-label` and `calculate-prerelease-version` work with read-only access.
 
 ## Development
 
 Since the node modules need to be commited to the repo the usual process is:
 
 1. Run `npm ci` to install prod and dev dependencies
-2. Make your changes to the ts code in src
-3. Run `npm run build` to compile the ts code to js
-4. Run `npm ci --omit dev` to remove the dev dependencies
-5. Commit the changes to the repo
+2. Make your changes to the ts code in src, including tests
+3. Run `npm test` to run the unit tests
+4. Run `npm run build` to compile the ts code to js
+5. Run `npm ci --omit dev` to remove the dev dependencies
+6. Commit the changes to the repo
+
+CI fails if the committed `dist/` does not match a fresh build, so a forgotten build step is caught on the PR.
+
+## Releasing
+
+This repository releases itself using its own actions via the workflows linked in [Versioning schemes](#versioning-schemes). The release workflows pin to the **previous** release tag rather than using the local versions, so a broken change cannot break its own release path. `validate-pr.yml` does the opposite deliberately: it runs the local build of `validate-semver-label`, so every PR also smoke-tests the freshly built `dist/`.
+
+The process:
+
+1. Label the PR with `semver:major`, `semver:minor` or `semver:patch` (enforced by the Validate PR workflow).
+2. Merge the PR: the Release Candidate workflow cuts the next `vX.Y.Z-rc.N` tag and prerelease automatically.
+3. Test the prerelease tag in a downstream project.
+4. Run the Release Stable workflow **from the prerelease tag being promoted** (so the stable tag lands on the same commit), entering the stable version (e.g. `v0.5.0`). This creates the stable tag, publishes the release, and cleans up the intermediate rc releases and tags.
+5. In a follow-up PR, bump the pinned action versions in the release workflows to the new release.

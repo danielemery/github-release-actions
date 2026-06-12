@@ -1,0 +1,44 @@
+# .github/workflows/release-stable.yml
+name: Release Stable
+
+# Promote a prerelease to a stable release. Run this workflow FROM THE
+# PRERELEASE TAG being promoted (so the stable tag is created on the same
+# commit), providing the stable version it should become.
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Stable v-prefixed version to release (e.g. v1.2.3)'
+        required: true
+
+concurrency:
+  group: "prod-deployment"
+
+jobs:
+  release-stable:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Write is required to create/update/delete releases AND to write tags
+    steps:
+      # The actions are pinned to the previous release so a broken change
+      # cannot break its own release path.
+      - name: Create stable tag and intermediate prerelease
+        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
+        with:
+          release-version: ${{ inputs.release-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Perform pre-release actions
+        uses: danielemery/github-release-actions/perform-pre-release@v0.4.0
+        id: pre_release
+        with:
+          release-version: ${{ inputs.release-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # This repository has no deployment step: publishing the release IS the
+      # deployment. Downstream projects would deploy between pre and post.
+      - name: Perform post-release actions
+        uses: danielemery/github-release-actions/perform-post-release@v0.4.0
+        with:
+          release-id: ${{ steps.pre_release.outputs.release-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
