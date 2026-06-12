@@ -19,14 +19,14 @@ jobs:
       # The actions are pinned to the previous release so a broken change
       # cannot break its own release path.
       - name: Calculate prerelease version
-        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.5.0
         id: calculate_version
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           prerelease-identifier: rc
 
       - name: Create prerelease
-        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
+        uses: danielemery/github-release-actions/create-prerelease@v0.5.0
         with:
           # The tag output (not version) so the created tag is v-prefixed.
           release-version: ${{ steps.calculate_version.outputs.tag }}
