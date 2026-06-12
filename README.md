@@ -106,6 +106,7 @@ jobs:
 | Name              | Required | Description                                                                                       |
 | ----------------- | -------- | -------------------------------------------------------------------------------------------------- |
 | `release-version` | Yes      | The tag name of the target release.                                                                |
+| `promote-to-stable` | No     | Set to `true` to promote a semver prerelease to its stable release; the stable tag is derived by stripping the prerelease suffix (e.g. `v1.2.3-rc.2` → `v1.2.3`). See [Promoting a semver prerelease](#promoting-a-semver-prerelease-to-a-stable-release). |
 | `github-token`    | Yes      | Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`.    |
 
 #### perform-pre-release outputs
@@ -161,7 +162,19 @@ jobs:
 
 #### Promoting a semver prerelease to a stable release
 
-With date tags the production release keeps the tag it was given at prerelease time, so the two actions above are enough. With semver tags the promotion should instead produce a clean `vX.Y.Z` tag: first run `create-prerelease` with the stable tag (from the commit of the prerelease being promoted), then point `perform-pre-release`/`perform-post-release` at that stable tag. `perform-post-release` cleans up the intermediate `-{identifier}.N` releases and their tags as part of the promotion. See this repository's own [`release-stable.yml`](./.github/workflows/release-stable.yml) for a complete example.
+With date tags the production release keeps the tag it was given at prerelease time, so the two actions above are enough. With semver tags the promotion should instead produce a clean `vX.Y.Z` tag: pass the prerelease tag as `release-version` and set `promote-to-stable`, and the stable tag is derived automatically:
+
+```yml
+- name: Perform pre-release actions
+  uses: danielemery/github-release-actions/perform-pre-release@v0.4.0 # 0.5.0 or later required for promote-to-stable
+  id: pre_release
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    release-version: v1.1.0-rc.2 # typically a workflow_dispatch input
+    promote-to-stable: true # releases as v1.1.0
+```
+
+The end-user flow this enables: browse the releases page, copy the prerelease version to promote, paste it into a `workflow_dispatch` input, run. The draft release is created with the stable tag name, anchored to the prerelease's commit. The stable tag itself does not exist until `perform-post-release` publishes the draft — GitHub creates it at that moment — so an aborted deployment leaves no stray stable tag behind. `perform-post-release` also cleans up the intermediate `-{identifier}.N` releases and their tags as part of the promotion, and the generated release notes reference the stable tag.
 
 ### /validate-semver-label
 

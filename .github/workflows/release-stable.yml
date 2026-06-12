@@ -20,13 +20,35 @@ jobs:
     permissions:
       contents: write # Write is required to create/update/delete releases AND to write tags
     steps:
+      - name: Validate release-version input
+        env:
+          RELEASE_VERSION: ${{ inputs.release-version }}
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::release-version must be a stable v-prefixed version like v1.2.3 (the version the prerelease becomes), got '$RELEASE_VERSION'."
+            exit 1
+          fi
+
       # The actions are pinned to the previous release so a broken change
       # cannot break its own release path.
+      #
+      # TODO: once the pins reach a release with perform-pre-release's
+      # promote-to-stable input, drop this create-prerelease step and instead
+      # pass the rc tag as release-version with promote-to-stable: true
+      # (taking the rc tag as the workflow input rather than the stable
+      # version).
       - name: Create stable tag and intermediate prerelease
         uses: danielemery/github-release-actions/create-prerelease@v0.4.0
         with:
           release-version: ${{ inputs.release-version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Stopgap for the v0.4.x pins: the release list API is eventually
+      # consistent, so perform-pre-release can miss the release created just
+      # above (this broke the v0.4.1 release). Fixed properly in newer
+      # versions via a direct tag lookup; remove with the rewrite below.
+      - name: Wait for the release list to settle
+        run: sleep 30
 
       - name: Perform pre-release actions
         uses: danielemery/github-release-actions/perform-pre-release@v0.4.0

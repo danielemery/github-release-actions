@@ -5,8 +5,9 @@ import { performPreRelease } from "./perform-prerelease";
 
 const githubToken = core.getInput("github-token");
 const targetTagName = core.getInput("release-version");
+const promoteToStable = core.getInput("promote-to-stable") === "true";
 const octokit = github.getOctokit(githubToken);
-performPreRelease(createContext(octokit, github.context), targetTagName)
+performPreRelease(createContext(octokit, github.context), targetTagName, promoteToStable)
   .then((result) => {
     core.setOutput("release-id", result.releaseId);
     core.setOutput("is-existing-release", result.isExistingRelease);

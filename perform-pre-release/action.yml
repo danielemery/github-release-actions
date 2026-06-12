@@ -4,6 +4,17 @@ inputs:
   release-version:
     description: 'The tag name of the target release.'
     required: true
+  promote-to-stable:
+    description: |
+      Set to true when promoting a semver prerelease to its stable release.
+      The stable tag is derived from release-version by stripping the
+      prerelease suffix (e.g. v1.2.3-rc.2 -> v1.2.3). The draft release is
+      created with the stable tag name anchored to the prerelease's commit,
+      and the tag itself is created when perform-post-release publishes the
+      draft. The stable tag must not already exist on a different commit.
+      Invalid if the target is already a full release.
+    required: false
+    default: 'false'
   github-token:
     description: "Token used to authenticate with the GitHub API, typically the value of `secrets.GITHUB_TOKEN`"
     required: true

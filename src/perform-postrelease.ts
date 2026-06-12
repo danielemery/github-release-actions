@@ -15,11 +15,30 @@ export async function performPostRelease(
   });
 
   if (targetRelease.draft) {
-    // Find all prereleases that will be included in the target release
+    // Find all prereleases that will be included in the target release.
+    // A draft's tag only exists once the draft is published, so when the tag
+    // is missing (e.g. promoting a prerelease to a new stable tag) ancestry
+    // comparisons pivot on the draft's target commitish instead.
     logger.info("Target is a draft release, finding prereleases to bundle up");
+    let comparisonRef = targetRelease.tag_name;
+    try {
+      await octokit.rest.git.getRef({
+        owner,
+        repo,
+        ref: `tags/${targetRelease.tag_name}`,
+      });
+    } catch (e) {
+      if ((e as { status?: number }).status !== 404) {
+        throw e;
+      }
+      logger.debug(
+        `Tag ${targetRelease.tag_name} does not exist yet, comparing against ${targetRelease.target_commitish}`
+      );
+      comparisonRef = targetRelease.target_commitish;
+    }
     const { olderPrereleases, newerPrereleases } = await collectPrereleases(
       { octokit, context, logger },
-      targetRelease.tag_name
+      comparisonRef
     );
 
     // Delete all these prereleases
