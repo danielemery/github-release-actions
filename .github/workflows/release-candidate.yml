@@ -1,0 +1,33 @@
+# .github/workflows/release-candidate.yml
+name: Release Candidate
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: "main"
+
+jobs:
+  release-candidate:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Write is required to create/update releases AND to write tags
+    steps:
+      # The actions are pinned to the previous release so a broken change
+      # cannot break its own release path.
+      - name: Calculate prerelease version
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
+        id: calculate_version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease-identifier: rc
+
+      - name: Create prerelease
+        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
+        with:
+          # The tag output (not version) so the created tag is v-prefixed.
+          release-version: ${{ steps.calculate_version.outputs.tag }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
