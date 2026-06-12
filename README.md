@@ -46,7 +46,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: danielemery/github-release-actions/create-prerelease@v0
+        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
         with:
           release-version: ${{ env.RELEASE_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
     environment: staging
     steps:
       - name: Calculate prerelease version
-        uses: danielemery/github-release-actions/calculate-prerelease-version@v0
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
         id: calculate_version
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
         run: echo "Created artifacts deployed to staging environment"
 
       - name: Create release
-        uses: danielemery/github-release-actions/create-prerelease@v0
+        uses: danielemery/github-release-actions/create-prerelease@v0.4.0
         with:
           release-version: ${{ steps.calculate_version.outputs.version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -127,7 +127,7 @@ jobs:
       is-existing-release: ${{ steps.pre_release.outputs.is-existing-release }}
     steps:
       - name: Perform pre-release actions
-        uses: danielemery/github-release-actions/perform-pre-release@v0
+        uses: danielemery/github-release-actions/perform-pre-release@v0.4.0
         id: pre_release
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -144,7 +144,7 @@ jobs:
         run: echo "Deployed ${{github.ref_name}} to production"
 
       - name: Perform post-release actions
-        uses: danielemery/github-release-actions/perform-post-release@v0
+        uses: danielemery/github-release-actions/perform-post-release@v0.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-id: ${{ needs.prepare-production-deployment.outputs.release-id }}
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate semver label
-        uses: danielemery/github-release-actions/validate-semver-label@v0
+        uses: danielemery/github-release-actions/validate-semver-label@v0.4.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -221,7 +221,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Calculate prerelease version
-        uses: danielemery/github-release-actions/calculate-prerelease-version@v0
+        uses: danielemery/github-release-actions/calculate-prerelease-version@v0.4.0
         id: calculate_version
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
